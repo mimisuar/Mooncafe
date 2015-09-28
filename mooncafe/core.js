@@ -9,6 +9,7 @@ mooncafe.errors = [];
 // some info about mooncafe //
 mooncafe.version = "0.0.0"
 mooncafe.versionName = "pre-alpha"
+mooncafe._initialized = false;
 
 // simple utility functions //
 
@@ -20,6 +21,11 @@ mooncafe.require = function(fname, callback) {
 }
 
 mooncafe.init = function() {
+	if (mooncafe._initialized) {
+		console.log("Mooncafe has already been initialized.");
+		return;
+	}
+	
 	
 	mooncafe.require("mooncafe/lua.vm.js");
 	mooncafe.require("mooncafe/graphics.js");
@@ -49,6 +55,7 @@ mooncafe.init = function() {
 		if (mooncafe.L && mooncafe.graphics) {
 			clearInterval(intval.main);
 			finish();
+			mooncafe._initialized = true;
 		}
 	}, 1000);
 	
@@ -93,4 +100,25 @@ mooncafe.check = function(pos, type) {
 	}
 	
 	return mooncafe.L.lua_to_js(pos);
+}
+
+mooncafe.registerFunctions = function(pos, funcs) {
+	for (i = 0; i < funcs.length; i++) {
+		
+		if (!funcs[i].name) {
+			throw "Nil table value.";
+		}
+		
+		if (!funcs[i].func) {
+			console.log("Nil will be registered.");
+		}
+		
+		mooncafe.setIndex(pos, funcs[i].name, funcs[i].func);
+	}
+}
+
+mooncafe.clearStack = function() {
+	if (mooncafe.L.gettop() > 0) {
+		mooncafe.L.pop(mooncafe.L.gettop());
+	}
 }
