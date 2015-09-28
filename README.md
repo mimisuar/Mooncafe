@@ -12,6 +12,10 @@ Added "core.js" to your webpage. Then in an "onload" event call "mooncafe.init()
 
 The most basic mooncafe webpage should look like:
 
+
+```
+#!html
+
 <html>  
 	<head>  
 		<script src="mooncafe/core.js"></script>  
@@ -19,3 +23,4 @@ The most basic mooncafe webpage should look like:
 	  
 	<body onload="mooncafe.init()"></body>  
 </html>
+```
