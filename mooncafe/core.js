@@ -42,6 +42,26 @@ mooncafe.init = function() {
 		mooncafe.graphics.init();
 		
 		mooncafe.L.setglobal("mooncafe");
+		
+		// now we load the lua stuff //
+		mooncafe.loadFile("mooncafe/boot_min.lua", function(code) { mooncafe.L.execute(code); });
+		try {
+			mooncafe.loadFile("main.lua", function(code) { 
+				mooncafe.L.execute(code); 
+				
+				// now that we have loaded the file, we can actually start up the game //
+				mooncafe.L.getglobal("mooncafe");
+				mooncafe.getIndex(1, "boot");
+				var boot = mooncafe.check(2, "function");
+				boot.call();
+			
+			});
+			
+			
+		} catch(e) {
+			mooncafe.errors.push(e);
+			throw "No main.lua found. Please include it.";
+		}
 	}
 	
 	// We need to wait until lua.vm.js has been loaded completely before create a new lua state. //
@@ -121,4 +141,34 @@ mooncafe.clearStack = function() {
 	if (mooncafe.L.gettop() > 0) {
 		mooncafe.L.pop(mooncafe.L.gettop());
 	}
+}
+
+mooncafe.loadFile = function(fname, callback) {
+	if (!fname) {
+		throw "No file name provided.";
+	}
+	
+	if (!callback) {
+		throw "Callback is required.";
+	}
+	
+	var xhr = new XMLHttpRequest();
+	
+	var response, failed;
+	
+	xhr.open("GET", fname)
+	
+	xhr.onload = function() {
+		if (xhr.status == 200 || (xhr.status == 0 && xhr.response)) {
+			callback(xhr.response);
+		} else {
+			throw "Unable to load file " + fname + ".";
+		}
+	}
+	
+	xhr.onerror = function() {
+		throw "Unable to open file " + fname + ".";
+	}
+	
+	xhr.send();
 }

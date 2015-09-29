@@ -50,12 +50,56 @@ mooncafe.graphics.api = [
 				a = mooncafe.check(5, "number");
 			}
 			
-			var color = "rgba(" + r + ", " + g + ", " + ", " + b + ", " + a + ")";
+			var color = "rgba(" + r + ", " + g + ", " + b + ", " + a + ")";
 			
-			mooncafe.L.fillStyle = color;
-			mooncafe.L.fillStyle = color;
+			mooncafe.context.fillStyle = color;
+			mooncafe.context.strokeStyle = color;
+		}
+	},
+	
+	{
+		name: "clear",
+		
+		func: function() {
+			mooncafe.context.clearRect(0, 0, mooncafe.canvas.width, mooncafe.canvas.height);
+		}
+	},
+	
+	{
+		name: "rectangle",
+		
+		func: function()  {
+			var style = mooncafe.check(2, "string");
+			var x = mooncafe.check(3, "number");
+			var y = mooncafe.check(4, "number");
+			var w = mooncafe.check(5, "number");
+			var h = mooncafe.check(6, "number");
 			
-			//
+			if (style == "fill") {
+				mooncafe.context.fillRect(x, y, w, h);
+			}
+			else if (style == "stroke") {
+				mooncafe.context.strokeRect(x, y, w, h);
+			}
+			else {
+				throw "Invalid style " + style + ".";
+			}
+		}
+	},
+	
+	{ 
+		name: "getWidth",
+		
+		func: function() {
+			return mooncafe.canvas.width;
+		}
+	},
+	
+	{
+		name: "getHeight",
+		
+		func: function() {
+			return mooncafe.canvas.height;
 		}
 	}
 ]
