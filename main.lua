@@ -33,18 +33,18 @@ function finishLoading()
 		this.y = this.y + moveSpeed* verticleMovement
 		
 		if this.x > mooncafe.graphics.getWidth() + this.width then
-			this.x = 0
+			this.x = -this.width
 		end
 		
 		if this.y > mooncafe.graphics.getHeight() + this.height then
-			this.y = 0
+			this.y = -this.height
 		end
 		
-		if this.x < 0 then
+		if this.x < -this.width then
 			this.x = mooncafe.graphics.getWidth() + this.width
 		end
 		
-		if this.y < 0 then
+		if this.y < -this.height then
 			this.y = mooncafe.graphics.getHeight() + this.height
 		end
 	end
