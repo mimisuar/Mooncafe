@@ -101,5 +101,29 @@ mooncafe.graphics.api = [
 		func: function() {
 			return mooncafe.canvas.height;
 		}
+	},
+	
+	{
+		name: "circle",
+		
+		func: function() {
+			var style = mooncafe.check(2, "string");
+			var x = mooncafe.check(3, "number");
+			var y = mooncafe.check(4, "number");
+			var radius = mooncafe.check(5, "number");
+			
+			if (style != "stroke" || style != "fill") {
+				throw "Invalid style " + style + ".";
+			}
+			
+			mooncafe.context.beginPath();
+			mooncafe.context.arc(x, y, radius, 0, 2 * Math.PI);
+			
+			if (style == "fill") {
+				mooncafe.context.fill();
+			} else {
+				mooncafe.context.stroke();
+			}
+		}
 	}
 ]
