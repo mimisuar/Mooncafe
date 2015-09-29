@@ -24,3 +24,5 @@ The most basic mooncafe webpage should look like:
 	<body onload="mooncafe.init()"></body>  
 </html>
 ```
+
+Also, don't use the wiki it is out of date.
