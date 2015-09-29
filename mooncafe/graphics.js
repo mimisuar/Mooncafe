@@ -112,7 +112,9 @@ mooncafe.graphics.api = [
 			var y = mooncafe.check(4, "number");
 			var radius = mooncafe.check(5, "number");
 			
-			if (style != "stroke" || style != "fill") {
+			
+			
+			if (style != "stroke" && style != "fill") {
 				throw "Invalid style " + style + ".";
 			}
 			

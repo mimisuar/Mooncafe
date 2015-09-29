@@ -13,7 +13,7 @@ mooncafe._initialized = false;
 
 // simple utility functions //
 
-mooncafe.require = function(fname, callback) {
+mooncafe.require = function(fname) {
 	// Load a javascript file. //
 	var tag = document.createElement("script");
 	tag.src = fname;
@@ -34,6 +34,7 @@ mooncafe.init = function() {
 	
 	var finish = function() {
 		// finish initilizing mooncafe //
+		
 		mooncafe.L.createtable();
 		
 		mooncafe.setIndex(1, "_version", mooncafe.version);
@@ -42,6 +43,8 @@ mooncafe.init = function() {
 		mooncafe.graphics.init();
 		
 		mooncafe.L.setglobal("mooncafe");
+		
+		mooncafe.overrideRequire();
 		
 		// now we load the lua stuff //
 		mooncafe.loadFile("mooncafe/boot_min.lua", function(code) { mooncafe.L.execute(code); });
@@ -54,7 +57,7 @@ mooncafe.init = function() {
 				mooncafe.getIndex(1, "boot");
 				var boot = mooncafe.check(2, "function");
 				boot.call();
-			
+				mooncafe.L.pop(2)
 			});
 			
 			
@@ -171,4 +174,43 @@ mooncafe.loadFile = function(fname, callback) {
 	}
 	
 	xhr.send();
+}
+
+mooncafe.overrideRequire = function() {
+	mooncafe.L.pushjs(function() {
+		var fname = mooncafe.check(2, "string");
+		var callback = function() { }
+		
+		console.log(fname);
+		
+		if (!mooncafe.L.isnoneornil(3)) {
+			callback = mooncafe.check(3, "function");
+		}
+		
+		mooncafe.clearStack();
+		// first lets check to see if we have already loaded the file before //
+		mooncafe.L.getglobal("package")
+		mooncafe.getIndex(1, "loaded")
+		mooncafe.getIndex(2, fname);
+		
+		if (!mooncafe.L.isnoneornil(3)) {
+			callback.call(mooncafe.L.lua_to_js(3));
+		} else {
+			// now we load the file //
+			
+			mooncafe.loadFile(fname + ".lua", function(code) {
+				var results = mooncafe.L.execute(code);
+				results = results[0];
+				
+				mooncafe.clearStack();
+				mooncafe.L.getglobal("package");
+				mooncafe.getIndex(1, "loaded");
+				mooncafe.setIndex(2, fname, results);
+				
+				callback.call(results);
+			});
+		}
+	});
+	
+	mooncafe.L.setglobal("require")
 }
