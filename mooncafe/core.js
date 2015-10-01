@@ -20,70 +20,6 @@ mooncafe.require = function(fname) {
 	document.head.appendChild(tag);
 }
 
-mooncafe.init = function() {
-	if (mooncafe._initialized) {
-		console.log("Mooncafe has already been initialized.");
-		return;
-	}
-	
-	
-	mooncafe.require("mooncafe/lua.vm.js");
-	mooncafe.require("mooncafe/graphics.js");
-	
-	var intval = {}
-	
-	var finish = function() {
-		// finish initilizing mooncafe //
-		
-		mooncafe.L.createtable();
-		
-		mooncafe.setIndex(1, "_version", mooncafe.version);
-		mooncafe.setIndex(1, "_name", mooncafe.versionName);
-		
-		mooncafe.graphics.init();
-		
-		mooncafe.L.setglobal("mooncafe");
-		
-		mooncafe.overrideRequire();
-		
-		// now we load the lua stuff //
-		mooncafe.loadFile("mooncafe/boot_min.lua", function(code) { mooncafe.L.execute(code); });
-		try {
-			mooncafe.loadFile("main.lua", function(code) { 
-				mooncafe.L.execute(code); 
-				
-				// now that we have loaded the file, we can actually start up the game //
-				mooncafe.L.getglobal("mooncafe");
-				mooncafe.getIndex(1, "boot");
-				var boot = mooncafe.check(2, "function");
-				boot.call();
-				mooncafe.L.pop(2)
-			});
-			
-			
-		} catch(e) {
-			mooncafe.errors.push(e);
-			throw "No main.lua found. Please include it.";
-		}
-	}
-	
-	// We need to wait until lua.vm.js has been loaded completely before create a new lua state. //
-	intval.main = setInterval(function() {
-		try {
-			mooncafe.L = new Lua.State();
-		} catch(e) {
-			mooncafe.errors.push(e); // push it because we want to wait //
-		}
-		
-		if (mooncafe.L && mooncafe.graphics) {
-			clearInterval(intval.main);
-			finish();
-			mooncafe._initialized = true;
-		}
-	}, 1000);
-	
-}
-
 mooncafe.typeOf = function(index) {
 	return mooncafe.L.typename(mooncafe.L.type(index));
 }
@@ -175,6 +111,74 @@ mooncafe.loadFile = function(fname, callback) {
 	
 	xhr.send();
 }
+
+mooncafe.init = function() {
+	if (mooncafe._initialized) {
+		console.log("Mooncafe has already been initialized.");
+		return;
+	}
+	
+	
+	mooncafe.require("mooncafe/lua.vm.js");
+	mooncafe.require("mooncafe/graphics.js");
+	mooncafe.require("mooncafe/timer.js");
+	
+	var intval = {}
+	
+	var finish = function() {
+		// finish initilizing mooncafe //
+		
+		mooncafe.L.createtable();
+		
+		mooncafe.setIndex(1, "_version", mooncafe.version);
+		mooncafe.setIndex(1, "_name", mooncafe.versionName);
+		
+		mooncafe.graphics.init();
+		mooncafe.timer.init();
+		
+		mooncafe.L.setglobal("mooncafe");
+		
+		mooncafe.overrideRequire();
+		
+		// now we load the lua stuff //
+		mooncafe.loadFile("mooncafe/boot_min.lua", function(code) { mooncafe.L.execute(code); });
+		try {
+			mooncafe.loadFile("main.lua", function(code) { 
+				mooncafe.L.execute(code); 
+				
+				// now that we have loaded the file, we can actually start up the game //
+				mooncafe.L.getglobal("mooncafe");
+				mooncafe.getIndex(1, "boot");
+				var boot = mooncafe.check(2, "function");
+				boot.call();
+				mooncafe.L.pop(2)
+			});
+			
+			
+		} catch(e) {
+			mooncafe.errors.push(e);
+			throw "No main.lua found. Please include it.";
+		}
+	}
+	
+	// We need to wait until lua.vm.js has been loaded completely before create a new lua state. //
+	intval.main = setInterval(function() {
+		try {
+			mooncafe.L = new Lua.State();
+		} catch(e) {
+			mooncafe.errors.push(e); // push it because we want to wait //
+		}
+		
+		if (mooncafe.L && mooncafe.graphics) {
+			clearInterval(intval.main);
+			finish();
+			mooncafe._initialized = true;
+		}
+	}, 1000);
+	
+}
+
+
 
 mooncafe.overrideRequire = function() {
 	mooncafe.L.pushjs(function() {

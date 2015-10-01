@@ -128,4 +128,4 @@ mooncafe.graphics.api = [
 			}
 		}
 	}
-]
+];

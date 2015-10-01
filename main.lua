@@ -63,22 +63,36 @@ function finishLoading()
 	-- add all of the shapes --
 	shapes = {}
 	
-	for i=1, 100 do
+	local interval1 = mooncafe.timer.newTimer(function()
 		table.insert(shapes, shape())
-	end
+	end, 100)
+	
+	local interval2 = mooncafe.timer.newTimer(function()
+		table.remove(shapes, 1)
+	end, 150)
+	
+	mooncafe.timer.newTimer(function()
+		interval1:clear()
+		interval2:clear()
+		print("It's all over")
+	end, 10000, false)
 end
 
 function mooncafe.draw()
 	mooncafe.graphics.setColor(0, 0, 0)
 	mooncafe.graphics.rectangle("stroke", 0, 0, mooncafe.graphics.getWidth(), mooncafe.graphics.getHeight())
 	
-	for i=1, #shapes do
-		shapes[i]:draw()
+	if shapes then
+		for i=1, #shapes do
+			shapes[i]:draw()
+		end
 	end
 end
 
 function mooncafe.update(dt)
-	for i=1, #shapes do
-		shapes[i]:update(dt)
+	if shapes then
+		for i=1, #shapes do
+			shapes[i]:update(dt)
+		end
 	end
 end
